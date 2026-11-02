@@ -21,7 +21,10 @@ import {
   Award,
   Layers,
   HelpCircle,
-  ShieldCheck
+  ShieldCheck,
+  User,
+  Heart,
+  Download
 } from 'lucide-react';
 import { calculatePrayerTimes, getHijriDate, POPULAR_CITIES, Coordinates } from '../../utils/prayerTimes';
 import { soundManager, AZAN_PRESETS } from '../../utils/audioPlayer';
@@ -35,6 +38,8 @@ interface HomeViewProps {
   onOpenSurah: (surahNumber: number) => void;
   lastRead: BookmarkItem | null;
   onOpenPlayStoreGuide: () => void;
+  onOpenCreatorModal: () => void;
+  onOpenDownloadModal: () => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -42,7 +47,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
   language,
   onOpenSurah,
   lastRead,
-  onOpenPlayStoreGuide
+  onOpenPlayStoreGuide,
+  onOpenCreatorModal,
+  onOpenDownloadModal
 }) => {
   const [selectedCity, setSelectedCity] = useState<Coordinates>(POPULAR_CITIES[3]); // Karachi default
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -408,6 +415,61 @@ export const HomeView: React.FC<HomeViewProps> = ({
         >
           View Instructions
         </button>
+      </div>
+
+      {/* Creator & Developer Signature Card with Real Photo */}
+      <div className="rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-teal-950 border border-emerald-600/50 p-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-3.5">
+          <div className="relative w-14 h-14 shrink-0">
+            <img
+              src="/creator-photo.jpg"
+              alt="Muhammad Younas"
+              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-amber-400 shadow-lg border border-slate-900"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center text-[10px] text-emerald-950 font-bold shadow">
+              ✓
+            </div>
+          </div>
+          <div>
+            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-amber-300" />
+              <span>Application Creator & Developer</span>
+            </span>
+            <h4 className="text-base font-extrabold text-white tracking-wide">
+              MUHAMMAD YOUNAS
+            </h4>
+            <p className="text-xs text-emerald-300 font-semibold flex items-center gap-1 mt-0.5">
+              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>UPPER DIR (دیر بالا), KPK, PAKISTAN</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={onOpenDownloadModal}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 flex items-center gap-1.5 transition"
+          >
+            <Download className="w-3.5 h-3.5 text-amber-400" />
+            <span>Downloads</span>
+          </button>
+
+          <button
+            onClick={onOpenCreatorModal}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 font-bold text-xs shadow-md transition whitespace-nowrap"
+          >
+            Creator Info
+          </button>
+        </div>
+      </div>
+
+      {/* Footer copyright & dedication note */}
+      <div className="text-center text-[11px] text-slate-500 pt-2 pb-1 space-y-0.5">
+        <p>Noor-ul-Quran • Created by <strong>Muhammad Younas</strong> (Upper Dir)</p>
+        <p className="font-arabic text-emerald-500/80">صدقہ جاریہ برائے امت مسلمہ</p>
       </div>
     </div>
   );

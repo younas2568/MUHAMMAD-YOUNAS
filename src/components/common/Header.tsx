@@ -11,7 +11,8 @@ import {
   Moon, 
   Sun,
   ShieldCheck,
-  Languages
+  Languages,
+  Download
 } from 'lucide-react';
 import { PWAInstallButton } from './PWAInstallButton';
 
@@ -25,6 +26,8 @@ interface HeaderProps {
   isMobileFrame: boolean;
   setIsMobileFrame: (val: boolean) => void;
   onOpenPlayStoreGuide: () => void;
+  onOpenCreatorModal: () => void;
+  onOpenDownloadModal: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,7 +39,9 @@ export const Header: React.FC<HeaderProps> = ({
   setIsDarkMode,
   isMobileFrame,
   setIsMobileFrame,
-  onOpenPlayStoreGuide
+  onOpenPlayStoreGuide,
+  onOpenCreatorModal,
+  onOpenDownloadModal
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-950 border-b border-emerald-800/50 shadow-md">
@@ -58,14 +63,36 @@ export const Header: React.FC<HeaderProps> = ({
                 PRO
               </span>
             </div>
-            <p className="text-[11px] text-emerald-200/80 font-arabic leading-none -mt-0.5">
-              نُوْرُ الْقُرْآنِ وَالسُّنَّةِ
+            <p className="text-[10px] text-amber-200/90 font-medium leading-none -mt-0.5">
+              By Muhammad Younas • Upper Dir
             </p>
           </div>
         </div>
 
         {/* Action Controls & Utilities */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Download Center Button */}
+          <button
+            onClick={onOpenDownloadModal}
+            title="Download App, Offline Quran & Resources"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-emerald-950 text-xs font-bold shadow-md transition"
+          >
+            <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span className="hidden sm:inline">Download</span>
+            <span className="sm:hidden text-[11px]">Download</span>
+          </button>
+
+          {/* Creator Profile Button */}
+          <button
+            onClick={onOpenCreatorModal}
+            title="App Creator: Muhammad Younas (Upper Dir)"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold shadow-sm transition"
+          >
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="hidden sm:inline">Creator</span>
+            <span className="sm:hidden text-[11px]">M. Younas</span>
+          </button>
+
           {/* PWA Install Button */}
           <PWAInstallButton />
 

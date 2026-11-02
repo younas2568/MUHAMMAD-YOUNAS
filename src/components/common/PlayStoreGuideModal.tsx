@@ -170,10 +170,48 @@ export const PlayStoreGuideModal: React.FC<PlayStoreGuideModalProps> = ({ isOpen
           )}
 
           {activeSubTab === 'checklist' && (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
+              {/* Developer & Publisher Profile Card */}
+              <div className="rounded-2xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 border border-emerald-600/50 p-4 shadow-lg flex items-center gap-3.5">
+                <div className="relative w-16 h-16 shrink-0">
+                  <img
+                    src="/creator-photo.jpg"
+                    alt="Muhammad Younas"
+                    className="w-16 h-16 rounded-2xl object-cover ring-2 ring-amber-400 shadow-md border border-slate-900"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center text-[10px] text-emerald-950 font-bold shadow">
+                    ✓
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
+                    Google Play Developer & Publisher Profile
+                  </span>
+                  <h4 className="text-base font-extrabold text-white">
+                    MUHAMMAD YOUNAS
+                  </h4>
+                  <p className="text-xs text-emerald-300 font-semibold mt-0.5">
+                    📍 UPPER DIR, KHYBER PAKHTUNKHWA, PAKISTAN
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                    younas889700@gmail.com
+                  </p>
+                </div>
+              </div>
+
               <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 space-y-2">
                 <h4 className="font-bold text-amber-300 text-sm">Google Play Console Submission Requirements</h4>
                 
+                <div className="flex items-start gap-2 text-xs text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white">Developer & Creator:</span> <strong className="text-amber-300">MUHAMMAD YOUNAS</strong> | Address: <strong className="text-emerald-300">UPPER DIR, KPK, PAKISTAN</strong> | Contact: <code className="text-slate-300">younas889700@gmail.com</code>.
+                  </div>
+                </div>
+
                 <div className="flex items-start gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>

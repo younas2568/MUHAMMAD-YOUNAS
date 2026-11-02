@@ -21,8 +21,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
-  Layers
+  Layers,
+  Download,
+  Check
 } from 'lucide-react';
+import { offlineStorage } from '../../utils/offlineStorage';
 
 interface SurahReaderProps {
   surahNumber: number;
@@ -59,6 +62,27 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
   const [showUrdu, setShowUrdu] = useState(true);
   const [showEnglish, setShowEnglish] = useState(true);
   const [showHindi, setShowHindi] = useState(false);
+  const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+
+  useEffect(() => {
+    offlineStorage.isSurahDownloaded(surahNumber).then(res => setIsDownloaded(res));
+  }, [surahNumber]);
+
+  const handleDownloadThisSurah = async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const audioUrl = getSurahAudioUrl(surahNumber);
+      await offlineStorage.cacheAudioFile(audioUrl, `surah_${surahNumber}`);
+      await offlineStorage.saveSurahOffline(surahData, true);
+      setIsDownloaded(true);
+    } catch (e) {
+      console.warn('Download error:', e);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   // Load verses from builtin or fetch from API if not yet cached
   useEffect(() => {
@@ -237,6 +261,22 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
+          {/* Download Surah button */}
+          <button
+            onClick={handleDownloadThisSurah}
+            disabled={isDownloading}
+            title={isDownloaded ? "Surah downloaded for offline use" : "Download Surah and audio offline"}
+            className={`p-1.5 rounded-xl border transition flex items-center gap-1 ${
+              isDownloaded
+                ? 'bg-emerald-950 text-emerald-400 border-emerald-600'
+                : isDownloading
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 animate-pulse'
+                : 'bg-slate-900 text-amber-300 border-emerald-700/40 hover:bg-emerald-900/50'
+            }`}
+          >
+            {isDownloaded ? <Check className="w-4 h-4 text-emerald-400" /> : <Download className="w-4 h-4" />}
+          </button>
+
           <button
             onClick={() => setShowTafsirModal(true)}
             title="Surah Explanation & Tafsir"

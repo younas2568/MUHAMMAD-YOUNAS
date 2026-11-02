@@ -4,6 +4,8 @@ import { Header } from './components/common/Header';
 import { BottomNav } from './components/common/BottomNav';
 import { OfflineIndicator } from './components/common/OfflineIndicator';
 import { PlayStoreGuideModal } from './components/common/PlayStoreGuideModal';
+import { CreatorModal } from './components/common/CreatorModal';
+import { DownloadCenterModal } from './components/common/DownloadCenterModal';
 
 import { HomeView } from './components/home/HomeView';
 import { QuranView } from './components/quran/QuranView';
@@ -26,6 +28,8 @@ export default function App() {
   const [isMobileFrame, setIsMobileFrame] = useState<boolean>(false);
   const [selectedSurahNumber, setSelectedSurahNumber] = useState<number | null>(null);
   const [isPlayStoreGuideOpen, setIsPlayStoreGuideOpen] = useState<boolean>(false);
+  const [isCreatorModalOpen, setIsCreatorModalOpen] = useState<boolean>(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState<boolean>(false);
 
   // Bookmarks in LocalStorage
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(() => {
@@ -93,6 +97,8 @@ export default function App() {
             onOpenSurah={handleOpenSurah}
             lastRead={lastRead}
             onOpenPlayStoreGuide={() => setIsPlayStoreGuideOpen(true)}
+            onOpenCreatorModal={() => setIsCreatorModalOpen(true)}
+            onOpenDownloadModal={() => setIsDownloadModalOpen(true)}
           />
         );
       case 'quran':
@@ -143,6 +149,8 @@ export default function App() {
             onOpenSurah={handleOpenSurah}
             lastRead={lastRead}
             onOpenPlayStoreGuide={() => setIsPlayStoreGuideOpen(true)}
+            onOpenCreatorModal={() => setIsCreatorModalOpen(true)}
+            onOpenDownloadModal={() => setIsDownloadModalOpen(true)}
           />
         );
     }
@@ -161,6 +169,8 @@ export default function App() {
         isMobileFrame={isMobileFrame}
         setIsMobileFrame={setIsMobileFrame}
         onOpenPlayStoreGuide={() => setIsPlayStoreGuideOpen(true)}
+        onOpenCreatorModal={() => setIsCreatorModalOpen(true)}
+        onOpenDownloadModal={() => setIsDownloadModalOpen(true)}
       />
 
       {/* Main Screen Content */}
@@ -181,6 +191,22 @@ export default function App() {
       <PlayStoreGuideModal
         isOpen={isPlayStoreGuideOpen}
         onClose={() => setIsPlayStoreGuideOpen(false)}
+      />
+
+      {/* Creator & Developer Profile Modal */}
+      <CreatorModal
+        isOpen={isCreatorModalOpen}
+        onClose={() => setIsCreatorModalOpen(false)}
+      />
+
+      {/* Download Center & Offline Management Modal */}
+      <DownloadCenterModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        onOpenPlayStoreGuide={() => {
+          setIsDownloadModalOpen(false);
+          setIsPlayStoreGuideOpen(true);
+        }}
       />
     </div>
   );

@@ -1,8 +1,10 @@
 {
   "name": "Noor-ul-Quran",
-  "description": "Complete modern Islamic mobile application featuring the Holy Quran with translations and audio, Namaz guide, Six Kalmas, Hadith collections, Daily Sunnah, Islamic Knowledge, Daily Duas, Prayer Times, Qibla compass, and Digital Tasbeeh.",
+  "description": "Created by Muhammad Younas (Upper Dir). Complete modern Islamic mobile application featuring the Holy Quran with translations and audio, Namaz guide, Six Kalmas, Hadith collections, Daily Sunnah, Islamic Knowledge, Daily Duas, Prayer Times, Qibla compass, and Digital Tasbeeh.",
   "requestFramePermissions": [
     "geolocation"
   ],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
