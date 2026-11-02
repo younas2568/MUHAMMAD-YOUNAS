@@ -86,9 +86,16 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenCreatorModal}
             title="App Creator: Muhammad Younas (Upper Dir)"
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold shadow-sm transition"
+            className="flex items-center gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold shadow-sm transition"
           >
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <img
+              src="/creator-photo.jpg"
+              alt="Muhammad Younas"
+              className="w-4 h-4 rounded-full object-cover object-top ring-1 ring-amber-400 shrink-0"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
             <span className="hidden sm:inline">Creator</span>
             <span className="sm:hidden text-[11px]">M. Younas</span>
           </button>

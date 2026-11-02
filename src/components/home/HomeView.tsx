@@ -420,11 +420,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* Creator & Developer Signature Card with Real Photo */}
       <div className="rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-teal-950 border border-emerald-600/50 p-4 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-3.5">
-          <div className="relative w-14 h-14 shrink-0">
+          <div className="relative w-16 h-16 shrink-0">
             <img
               src="/creator-photo.jpg"
               alt="Muhammad Younas"
-              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-amber-400 shadow-lg border border-slate-900"
+              className="w-16 h-16 rounded-2xl object-cover object-top ring-2 ring-amber-400 shadow-lg border border-slate-900"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = 'none';
               }}

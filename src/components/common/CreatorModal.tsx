@@ -33,11 +33,11 @@ export const CreatorModal: React.FC<CreatorModalProps> = ({ isOpen, onClose }) =
 
         {/* Creator Identity Card with Real Photo */}
         <div className="rounded-2xl bg-gradient-to-br from-emerald-950 via-slate-950 to-teal-950 border border-emerald-600/50 p-5 text-center space-y-3 relative overflow-hidden shadow-inner">
-          <div className="relative w-28 h-28 mx-auto">
+          <div className="relative w-32 h-36 mx-auto">
             <img 
               src="/creator-photo.jpg" 
               alt="Muhammad Younas - Creator of Noor-ul-Quran" 
-              className="w-28 h-28 object-cover rounded-2xl mx-auto shadow-2xl ring-4 ring-amber-400 border-2 border-emerald-950"
+              className="w-32 h-36 object-cover object-top rounded-2xl mx-auto shadow-2xl ring-4 ring-amber-400 border-2 border-emerald-950"
               onError={(e) => {
                 // Fallback to stylized monogram if image load fails
                 (e.target as HTMLElement).style.display = 'none';

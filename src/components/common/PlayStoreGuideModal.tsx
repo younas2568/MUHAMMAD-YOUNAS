@@ -177,7 +177,7 @@ export const PlayStoreGuideModal: React.FC<PlayStoreGuideModalProps> = ({ isOpen
                   <img
                     src="/creator-photo.jpg"
                     alt="Muhammad Younas"
-                    className="w-16 h-16 rounded-2xl object-cover ring-2 ring-amber-400 shadow-md border border-slate-900"
+                    className="w-16 h-16 rounded-2xl object-cover object-top ring-2 ring-amber-400 shadow-md border border-slate-900"
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = 'none';
                     }}
