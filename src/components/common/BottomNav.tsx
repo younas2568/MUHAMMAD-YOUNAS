@@ -8,7 +8,8 @@ import {
   Sparkles, 
   Compass, 
   Layers,
-  ScrollText
+  ScrollText,
+  FileText
 } from 'lucide-react';
 
 interface BottomNavProps {
@@ -20,9 +21,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
   const navItems: { id: TabType; label: string; icon: React.FC<{ className?: string }>; arabic: string }[] = [
     { id: 'home', label: 'Home', icon: Home, arabic: 'الرئيسية' },
     { id: 'quran', label: 'Quran', icon: BookOpen, arabic: 'القرآن' },
+    { id: 'tafsir', label: 'Tafsir', icon: FileText, arabic: 'التفسير' },
     { id: 'namaz', label: 'Namaz', icon: Clock, arabic: 'الصلاة' },
     { id: 'hadith', label: 'Hadith', icon: ScrollText, arabic: 'الحديث' },
-    { id: 'duas', label: 'Duas', icon: HeartHandshake, arabic: 'الأدعية' },
     { id: 'prayer-times', label: 'Tools', icon: Compass, arabic: 'الأدوات' },
   ];
 

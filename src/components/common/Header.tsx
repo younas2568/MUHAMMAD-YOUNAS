@@ -129,6 +129,12 @@ export const Header: React.FC<HeaderProps> = ({
               اردو
             </button>
             <button
+              onClick={() => setLanguage('ps')}
+              className={`px-2 py-1 rounded font-arabic transition ${language === 'ps' ? 'bg-amber-500 text-emerald-950 font-bold' : 'text-emerald-200 hover:text-white'}`}
+            >
+              پښتو
+            </button>
+            <button
               onClick={() => setLanguage('ar')}
               className={`px-2 py-1 rounded font-arabic transition ${language === 'ar' ? 'bg-amber-500 text-emerald-950 font-bold' : 'text-emerald-200 hover:text-white'}`}
             >

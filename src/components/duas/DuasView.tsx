@@ -17,7 +17,8 @@ import {
   Utensils,
   Home,
   Shield,
-  RotateCcw
+  RotateCcw,
+  Volume2
 } from 'lucide-react';
 import { soundManager } from '../../utils/audioPlayer';
 
@@ -29,6 +30,7 @@ export const DuasView: React.FC<DuasViewProps> = ({ language }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [playingUrduId, setPlayingUrduId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [counters, setCounters] = useState<Record<string, number>>({});
 
@@ -50,9 +52,26 @@ export const DuasView: React.FC<DuasViewProps> = ({ language }) => {
       return;
     }
 
+    soundManager.stopAudio();
+    setPlayingUrduId(null);
     setPlayingId(dua.id);
     soundManager.speakText(dua.arabicText, 'ar-SA', () => {
       setPlayingId(null);
+    });
+  };
+
+  const handleToggleUrduVoice = (dua: DuaItem) => {
+    if (playingUrduId === dua.id) {
+      soundManager.stopAudio();
+      setPlayingUrduId(null);
+      return;
+    }
+
+    soundManager.stopAudio();
+    setPlayingId(null);
+    setPlayingUrduId(dua.id);
+    soundManager.speakTranslation(dua.translationUr, 'ur', () => {
+      setPlayingUrduId(null);
     });
   };
 
@@ -175,7 +194,7 @@ export const DuasView: React.FC<DuasViewProps> = ({ language }) => {
 
                   <button
                     onClick={() => handleToggleVoice(dua)}
-                    title={playingId === dua.id ? "Stop Recitation" : "Listen to Dua Pronunciation"}
+                    title={playingId === dua.id ? "Stop Recitation" : "Listen in Male Voice"}
                     className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
                       playingId === dua.id 
                         ? 'bg-amber-400 text-emerald-950 animate-pulse' 
@@ -183,7 +202,7 @@ export const DuasView: React.FC<DuasViewProps> = ({ language }) => {
                     }`}
                   >
                     {playingId === dua.id ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-300" />}
-                    <span>{playingId === dua.id ? 'Stop' : 'Recite'}</span>
+                    <span>{playingId === dua.id ? 'Stop' : 'دعا سنیں (مردانہ آواز)'}</span>
                   </button>
                 </div>
               </div>
@@ -207,8 +226,21 @@ export const DuasView: React.FC<DuasViewProps> = ({ language }) => {
                   {dua.translationEn}
                 </p>
 
-                <div className="pt-2 border-t border-slate-800 text-right">
-                  <strong className="text-amber-400 block text-xs mb-0.5 font-sans">اردو ترجمہ:</strong>
+                <div className="pt-2 border-t border-slate-800 text-right space-y-1">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => handleToggleUrduVoice(dua)}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold transition border ${
+                        playingUrduId === dua.id
+                          ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                          : 'bg-emerald-950 text-amber-300 border-emerald-800 hover:bg-emerald-900'
+                      }`}
+                    >
+                      {playingUrduId === dua.id ? <Pause className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+                      <span>{playingUrduId === dua.id ? 'Stop' : 'ترجمہ سنیں (مردانہ آواز)'}</span>
+                    </button>
+                    <strong className="text-amber-400 text-xs font-sans">اردو ترجمہ:</strong>
+                  </div>
                   <p className="font-arabic text-amber-100/90 leading-relaxed">
                     {dua.translationUr}
                   </p>

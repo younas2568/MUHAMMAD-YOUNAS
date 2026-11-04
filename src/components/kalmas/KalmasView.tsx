@@ -21,6 +21,7 @@ interface KalmasViewProps {
 export const KalmasView: React.FC<KalmasViewProps> = ({ language }) => {
   const [selectedKalmaId, setSelectedKalmaId] = useState<number>(1);
   const [playingId, setPlayingId] = useState<number | null>(null);
+  const [playingUrduId, setPlayingUrduId] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const selectedKalma = SIX_KALMAS.find(k => k.id === selectedKalmaId) || SIX_KALMAS[0];
@@ -32,9 +33,26 @@ export const KalmasView: React.FC<KalmasViewProps> = ({ language }) => {
       return;
     }
 
+    soundManager.stopAudio();
+    setPlayingUrduId(null);
     setPlayingId(kalma.id);
     soundManager.speakText(kalma.arabicText, 'ar-SA', () => {
       setPlayingId(null);
+    });
+  };
+
+  const handleToggleUrduAudio = (kalma: Kalma) => {
+    if (playingUrduId === kalma.id) {
+      soundManager.stopAudio();
+      setPlayingUrduId(null);
+      return;
+    }
+
+    soundManager.stopAudio();
+    setPlayingId(null);
+    setPlayingUrduId(kalma.id);
+    soundManager.speakTranslation(kalma.translationUr, 'ur', () => {
+      setPlayingUrduId(null);
     });
   };
 
@@ -154,8 +172,21 @@ export const KalmasView: React.FC<KalmasViewProps> = ({ language }) => {
 
         {/* Urdu & English Translations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 text-right">
-            <span className="text-xs font-bold text-amber-400 block mb-1.5">اردو ترجمہ:</span>
+          <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 text-right space-y-2">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => handleToggleUrduAudio(selectedKalma)}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition border ${
+                  playingUrduId === selectedKalma.id
+                    ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                    : 'bg-emerald-950 text-amber-300 border-emerald-800 hover:bg-emerald-900'
+                }`}
+              >
+                {playingUrduId === selectedKalma.id ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                <span>{playingUrduId === selectedKalma.id ? 'Stop' : 'ترجمہ سنیں (مردانہ آواز)'}</span>
+              </button>
+              <span className="text-xs font-bold text-amber-400">اردو ترجمہ:</span>
+            </div>
             <p className="font-arabic text-sm text-slate-100 leading-relaxed">
               {selectedKalma.translationUr}
             </p>

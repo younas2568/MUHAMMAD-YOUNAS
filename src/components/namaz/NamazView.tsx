@@ -28,20 +28,37 @@ export const NamazView: React.FC<NamazViewProps> = ({ language }) => {
   const [selectedStepIndex, setSelectedStepIndex] = useState<number>(0);
   const [selectedPrayer, setSelectedPrayer] = useState<PrayerTypeInfo>(PRAYERS_INFO[0]);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [playingAudioType, setPlayingAudioType] = useState<'arabic' | 'urdu' | 'english' | null>(null);
 
   const currentStep = STEP_BY_STEP_PRAYER[selectedStepIndex];
 
-  const handlePlayVoice = (text: string) => {
-    if (isPlayingAudio) {
+  const handlePlayVoice = (text: string, type: 'arabic' | 'urdu' | 'english' = 'arabic') => {
+    if (isPlayingAudio && playingAudioType === type) {
       soundManager.stopAudio();
       setIsPlayingAudio(false);
+      setPlayingAudioType(null);
       return;
     }
 
     setIsPlayingAudio(true);
-    soundManager.speakText(text, 'ar-SA', () => {
-      setIsPlayingAudio(false);
-    });
+    setPlayingAudioType(type);
+    
+    if (type === 'arabic') {
+      soundManager.speakText(text, 'ar-SA', () => {
+        setIsPlayingAudio(false);
+        setPlayingAudioType(null);
+      });
+    } else if (type === 'urdu') {
+      soundManager.speakTranslation(text, 'ur', () => {
+        setIsPlayingAudio(false);
+        setPlayingAudioType(null);
+      });
+    } else {
+      soundManager.speakTranslation(text, 'en', () => {
+        setIsPlayingAudio(false);
+        setPlayingAudioType(null);
+      });
+    }
   };
 
   return (
@@ -143,17 +160,22 @@ export const NamazView: React.FC<NamazViewProps> = ({ language }) => {
               </div>
 
               {currentStep.arabicText && (
-                <button
-                  onClick={() => handlePlayVoice(currentStep.audioVoiceText || currentStep.arabicText || '')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow ${
-                    isPlayingAudio 
-                      ? 'bg-amber-400 text-emerald-950 animate-pulse' 
-                      : 'bg-emerald-900/80 hover:bg-emerald-800 border border-emerald-600/50 text-emerald-200'
-                  }`}
-                >
-                  {isPlayingAudio ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-300" />}
-                  <span>{isPlayingAudio ? 'Stop' : 'Listen'}</span>
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-amber-300 font-bold bg-emerald-950 px-2 py-1 rounded-lg border border-emerald-700/60">
+                    🎙️ مردانہ آواز (Male Qari)
+                  </span>
+                  <button
+                    onClick={() => handlePlayVoice(currentStep.audioVoiceText || currentStep.arabicText || '', 'arabic')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition shadow ${
+                      isPlayingAudio && playingAudioType === 'arabic'
+                        ? 'bg-amber-400 text-emerald-950 animate-pulse' 
+                        : 'bg-emerald-900/80 hover:bg-emerald-800 border border-emerald-600/50 text-emerald-200'
+                    }`}
+                  >
+                    {isPlayingAudio && playingAudioType === 'arabic' ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 text-amber-300" />}
+                    <span>{isPlayingAudio && playingAudioType === 'arabic' ? 'Stop' : 'قراءت سنیں'}</span>
+                  </button>
+                </div>
               )}
             </div>
 
@@ -169,9 +191,14 @@ export const NamazView: React.FC<NamazViewProps> = ({ language }) => {
             {/* Arabic Recitation */}
             {currentStep.arabicText && (
               <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/70 to-slate-950 border border-emerald-800/60 text-right space-y-2">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 float-left">
-                  Arabic Recitation {currentStep.repetitionCount ? `(${currentStep.repetitionCount}x)` : ''}
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400">
+                    Arabic Recitation {currentStep.repetitionCount ? `(${currentStep.repetitionCount}x)` : ''}
+                  </span>
+                  <span className="text-[10px] text-emerald-300 font-bold font-arabic">
+                    🎙️ مردانہ آواز میں قراءت
+                  </span>
+                </div>
                 <div className="clear-both font-quran text-xl sm:text-2xl text-amber-100 font-bold leading-loose select-text py-1">
                   {currentStep.arabicText}
                 </div>
@@ -187,8 +214,21 @@ export const NamazView: React.FC<NamazViewProps> = ({ language }) => {
             {/* Translations */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
               {currentStep.translationUr && (
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-right">
-                  <span className="text-[10px] font-bold text-amber-400 block mb-1">ترجمہ (اردو):</span>
+                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-right space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => handlePlayVoice(currentStep.translationUr || '', 'urdu')}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold transition border ${
+                        isPlayingAudio && playingAudioType === 'urdu'
+                          ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                          : 'bg-emerald-950/80 text-amber-300 border-emerald-800 hover:bg-emerald-900'
+                      }`}
+                    >
+                      {isPlayingAudio && playingAudioType === 'urdu' ? <Pause className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+                      <span>{isPlayingAudio && playingAudioType === 'urdu' ? 'Stop' : 'ترجمہ سنیں (مردانہ آواز)'}</span>
+                    </button>
+                    <span className="text-[10px] font-bold text-amber-400">ترجمہ (اردو):</span>
+                  </div>
                   <p className="font-arabic text-xs sm:text-sm text-slate-200 leading-relaxed">
                     {currentStep.translationUr}
                   </p>
@@ -196,8 +236,21 @@ export const NamazView: React.FC<NamazViewProps> = ({ language }) => {
               )}
 
               {currentStep.translationEn && (
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-amber-400 block mb-1">English Translation:</span>
+                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-amber-400">English Translation:</span>
+                    <button
+                      onClick={() => handlePlayVoice(currentStep.translationEn || '', 'english')}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold transition border ${
+                        isPlayingAudio && playingAudioType === 'english'
+                          ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                          : 'bg-emerald-950/80 text-emerald-300 border-emerald-800 hover:bg-emerald-900'
+                      }`}
+                    >
+                      {isPlayingAudio && playingAudioType === 'english' ? <Pause className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+                      <span>{isPlayingAudio && playingAudioType === 'english' ? 'Stop' : 'Listen (Male Voice)'}</span>
+                    </button>
+                  </div>
                   <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
                     {currentStep.translationEn}
                   </p>
@@ -425,9 +478,18 @@ export const NamazView: React.FC<NamazViewProps> = ({ language }) => {
 
           {/* Dua After Wudu */}
           <div className="rounded-2xl bg-gradient-to-br from-emerald-950 to-slate-950 border border-emerald-600/50 p-4 shadow-xl text-right space-y-2">
-            <span className="text-[10px] uppercase font-bold text-amber-400 float-left">
-              Supplication Upon Completing Wudu
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-amber-400">
+                Supplication Upon Completing Wudu
+              </span>
+              <button
+                onClick={() => handlePlayVoice(WUDU_GUIDE.wuduDua.arabic, 'arabic')}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-900/80 hover:bg-emerald-800 border border-emerald-600/50 text-emerald-200 text-xs font-bold transition"
+              >
+                <Volume2 className="w-3.5 h-3.5 text-amber-300" />
+                <span>دعا سنیں (مردانہ آواز)</span>
+              </button>
+            </div>
             <div className="clear-both font-quran text-lg sm:text-xl text-amber-100 font-bold leading-relaxed py-1">
               {WUDU_GUIDE.wuduDua.arabic}
             </div>
@@ -437,9 +499,17 @@ export const NamazView: React.FC<NamazViewProps> = ({ language }) => {
             <p className="text-xs text-slate-300 text-left pt-1 border-t border-emerald-900/40">
               "{WUDU_GUIDE.wuduDua.translationEn}"
             </p>
-            <p className="font-arabic text-xs text-amber-200/90 text-right">
-              {WUDU_GUIDE.wuduDua.translationUr}
-            </p>
+            <div className="flex items-center justify-between pt-1">
+              <button
+                onClick={() => handlePlayVoice(WUDU_GUIDE.wuduDua.translationUr, 'urdu')}
+                className="text-[11px] text-amber-400 hover:text-amber-300 underline font-arabic"
+              >
+                🔊 اردو ترجمہ سنیں
+              </button>
+              <p className="font-arabic text-xs text-amber-200/90 text-right">
+                {WUDU_GUIDE.wuduDua.translationUr}
+              </p>
+            </div>
           </div>
 
           {/* Nullifiers of Wudu */}

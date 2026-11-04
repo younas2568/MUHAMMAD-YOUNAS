@@ -9,6 +9,7 @@ import { DownloadCenterModal } from './components/common/DownloadCenterModal';
 
 import { HomeView } from './components/home/HomeView';
 import { QuranView } from './components/quran/QuranView';
+import { TafsirView } from './components/tafsir/TafsirView';
 import { NamazView } from './components/namaz/NamazView';
 import { KalmasView } from './components/kalmas/KalmasView';
 import { HadithView } from './components/hadith/HadithView';
@@ -112,6 +113,13 @@ export default function App() {
             onRemoveBookmark={handleRemoveBookmark}
             lastRead={lastRead}
             onSaveLastRead={handleSaveLastRead}
+          />
+        );
+      case 'tafsir':
+        return (
+          <TafsirView
+            initialSurahNumber={selectedSurahNumber || 1}
+            onOpenQuranReader={handleOpenSurah}
           />
         );
       case 'namaz':

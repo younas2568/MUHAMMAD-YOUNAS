@@ -60,10 +60,13 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
   const [showTafsirModal, setShowTafsirModal] = useState(false);
   const [selectedAyahForTafsir, setSelectedAyahForTafsir] = useState<Ayah | null>(null);
   const [showUrdu, setShowUrdu] = useState(true);
+  const [showPashto, setShowPashto] = useState(true);
   const [showEnglish, setShowEnglish] = useState(true);
   const [showHindi, setShowHindi] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [playingTranslationAyah, setPlayingTranslationAyah] = useState<{ ayahNum: number, lang: 'ur' | 'ps' | 'en' } | null>(null);
+  const [isPlayingTafsirVoice, setIsPlayingTafsirVoice] = useState(false);
 
   useEffect(() => {
     offlineStorage.isSurahDownloaded(surahNumber).then(res => setIsDownloaded(res));
@@ -105,21 +108,23 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
       }
     }
 
-    // Fetch from Al-Quran Cloud API with English, Urdu & Hindi translations
+    // Fetch from Al-Quran Cloud API with English, Urdu & Pashto (Abdul Wali) translations
     setIsLoading(true);
-    fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/editions/quran-uthmani,en.sahih,ur.jalandhry`)
+    fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/editions/quran-uthmani,en.sahih,ur.jalandhry,ps.abdulwali`)
       .then(res => res.json())
       .then(data => {
         if (data.code === 200 && data.data && data.data.length >= 2) {
           const arabicData = data.data[0].ayahs;
           const englishData = data.data[1].ayahs;
           const urduData = data.data[2] ? data.data[2].ayahs : [];
+          const pashtoData = data.data[3] ? data.data[3].ayahs : [];
 
           const compiledVerses: Ayah[] = arabicData.map((a: any, i: number) => ({
             numberInSurah: a.numberInSurah,
             textArabic: a.text,
             translationEn: englishData[i] ? englishData[i].text : '',
             translationUr: urduData[i] ? urduData[i].text : '',
+            translationPs: pashtoData[i] ? pashtoData[i].text : '',
             translationHi: `सूरह ${meta.hindiName} - आयत ${a.numberInSurah}`
           }));
 
@@ -209,6 +214,38 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
       () => setIsPlayingFullSurah(false),
       () => setIsPlayingFullSurah(false)
     );
+  };
+
+  const handlePlayTranslationVoice = (ayah: Ayah, lang: 'ur' | 'ps' | 'en') => {
+    if (playingTranslationAyah && playingTranslationAyah.ayahNum === ayah.numberInSurah && playingTranslationAyah.lang === lang) {
+      soundManager.stopAudio();
+      setPlayingTranslationAyah(null);
+      return;
+    }
+
+    const textToSpeak = lang === 'ur' ? ayah.translationUr : lang === 'ps' ? (ayah.translationPs || '') : ayah.translationEn;
+    if (!textToSpeak) return;
+
+    soundManager.stopAudio();
+    setIsPlayingAudio(false);
+    setIsPlayingFullSurah(false);
+    setPlayingTranslationAyah({ ayahNum: ayah.numberInSurah, lang });
+
+    soundManager.speakTranslation(textToSpeak, lang, () => {
+      setPlayingTranslationAyah(null);
+    });
+  };
+
+  const handlePlayTafsirVoice = (text: string) => {
+    if (isPlayingTafsirVoice) {
+      soundManager.stopAudio();
+      setIsPlayingTafsirVoice(false);
+      return;
+    }
+    setIsPlayingTafsirVoice(true);
+    soundManager.speakTafsir(text, 'ur', () => {
+      setIsPlayingTafsirVoice(false);
+    });
   };
 
   const isBookmarked = (verseNum: number) => {
@@ -350,6 +387,12 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
             اردو
           </button>
           <button
+            onClick={() => setShowPashto(!showPashto)}
+            className={`px-2 py-1 rounded-lg font-arabic text-xs transition ${showPashto ? 'bg-amber-500 text-emerald-950 font-bold shadow-sm' : 'text-slate-400'}`}
+          >
+            پښتو
+          </button>
+          <button
             onClick={() => setShowEnglish(!showEnglish)}
             className={`px-2 py-1 rounded-lg text-xs transition ${showEnglish ? 'bg-emerald-800 text-amber-300 font-bold' : 'text-slate-400'}`}
           >
@@ -481,17 +524,88 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
               )}
 
               {/* Translations Container */}
-              <div className="mt-3 space-y-2 pt-2 border-t border-slate-800/60">
+              <div className="mt-3 space-y-2.5 pt-2 border-t border-slate-800/60">
                 {showUrdu && ayah.translationUr && (
-                  <p className="text-right font-arabic text-sm text-amber-100/90 leading-relaxed">
-                    {ayah.translationUr}
-                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <button
+                        onClick={() => handlePlayTranslationVoice(ayah, 'ur')}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold transition border ${
+                          playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'ur'
+                            ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                            : 'bg-emerald-950/70 text-amber-300 border-emerald-800/80 hover:bg-emerald-900'
+                        }`}
+                        title="Listen Urdu translation in male voice"
+                      >
+                        {playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'ur' ? (
+                          <Pause className="w-3 h-3" />
+                        ) : (
+                          <Volume2 className="w-3 h-3" />
+                        )}
+                        <span>{playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'ur' ? 'روکیں' : 'اردو ترجمہ سنیں (مردانہ آواز)'}</span>
+                      </button>
+                      <span className="text-[10px] text-amber-400/80 font-arabic">اردو ترجمہ:</span>
+                    </div>
+                    <p className="text-right font-arabic text-sm text-amber-100/90 leading-relaxed" dir="rtl">
+                      {ayah.translationUr}
+                    </p>
+                  </div>
+                )}
+
+                {showPashto && ayah.translationPs && (
+                  <div className="bg-emerald-950/40 border-r-2 border-amber-400/90 pr-2.5 py-1.5 rounded-l-xl text-right space-y-1">
+                    <div className="flex items-center justify-between">
+                      <button
+                        onClick={() => handlePlayTranslationVoice(ayah, 'ps')}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold transition border ${
+                          playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'ps'
+                            ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                            : 'bg-emerald-950/90 text-amber-300 border-emerald-700/80 hover:bg-emerald-900'
+                        }`}
+                        title="Listen Pashto translation in male voice"
+                      >
+                        {playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'ps' ? (
+                          <Pause className="w-3 h-3" />
+                        ) : (
+                          <Volume2 className="w-3 h-3" />
+                        )}
+                        <span>{playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'ps' ? 'بند کړئ' : 'پښتو ژباړه واورئ (مردانه آواز)'}</span>
+                      </button>
+                      <span className="text-[10px] uppercase font-bold text-amber-400 font-arabic">
+                        پښتو ژباړه:
+                      </span>
+                    </div>
+                    <p className="text-right font-arabic text-sm text-emerald-100 leading-relaxed" dir="rtl">
+                      {ayah.translationPs}
+                    </p>
+                  </div>
                 )}
 
                 {showEnglish && ayah.translationEn && (
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    {ayah.translationEn}
-                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400">English Translation:</span>
+                      <button
+                        onClick={() => handlePlayTranslationVoice(ayah, 'en')}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold transition border ${
+                          playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'en'
+                            ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                            : 'bg-slate-950 text-slate-300 border-slate-800 hover:text-white'
+                        }`}
+                        title="Listen English translation in male voice"
+                      >
+                        {playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'en' ? (
+                          <Pause className="w-3 h-3" />
+                        ) : (
+                          <Volume2 className="w-3 h-3" />
+                        )}
+                        <span>{playingTranslationAyah?.ayahNum === ayah.numberInSurah && playingTranslationAyah?.lang === 'en' ? 'Stop' : 'Listen English (Male Voice)'}</span>
+                      </button>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                      {ayah.translationEn}
+                    </p>
+                  </div>
                 )}
 
                 {showHindi && ayah.translationHi && (
@@ -522,6 +636,8 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
                 onClick={() => {
                   setShowTafsirModal(false);
                   setSelectedAyahForTafsir(null);
+                  soundManager.stopAudio();
+                  setIsPlayingTafsirVoice(false);
                 }}
                 className="p-1 rounded-lg text-slate-400 hover:text-white"
               >
@@ -535,12 +651,38 @@ export const SurahReader: React.FC<SurahReaderProps> = ({
                   <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-right font-quran text-lg text-emerald-200 mb-3">
                     {selectedAyahForTafsir.textArabic}
                   </div>
-                  <p className="text-amber-200 font-semibold mb-1">Authentic Commentary & Tafsir:</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-amber-200 font-semibold">Authentic Commentary & Tafsir:</p>
+                    <button
+                      onClick={() => handlePlayTafsirVoice(selectedAyahForTafsir.tafsir || "Authentic Tafsir sourced from Tafsir Ibn Kathir and Ma'ariful Quran.")}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition border ${
+                        isPlayingTafsirVoice
+                          ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                          : 'bg-emerald-950 text-amber-300 border-emerald-800 hover:bg-emerald-900'
+                      }`}
+                    >
+                      {isPlayingTafsirVoice ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                      <span>{isPlayingTafsirVoice ? 'Stop' : 'تفسیر سنیں (مردانہ آواز)'}</span>
+                    </button>
+                  </div>
                   <p className="text-slate-300">{selectedAyahForTafsir.tafsir || "Authentic Tafsir sourced from Tafsir Ibn Kathir and Ma'ariful Quran."}</p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-amber-300 font-bold text-sm mb-2">Introduction to Surah {surahData.transliteration}:</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-amber-300 font-bold text-sm">Introduction to Surah {surahData.transliteration}:</p>
+                    <button
+                      onClick={() => handlePlayTafsirVoice(surahData.tafsirSummary || '')}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition border ${
+                        isPlayingTafsirVoice
+                          ? 'bg-amber-400 text-emerald-950 border-amber-300'
+                          : 'bg-emerald-950 text-amber-300 border-emerald-800 hover:bg-emerald-900'
+                      }`}
+                    >
+                      {isPlayingTafsirVoice ? <Pause className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                      <span>{isPlayingTafsirVoice ? 'Stop' : 'تعارف سنیں (مردانہ آواز)'}</span>
+                    </button>
+                  </div>
                   <p className="text-slate-300 leading-relaxed">{surahData.tafsirSummary}</p>
                   <div className="mt-3 bg-emerald-950/60 border border-emerald-700/40 p-3 rounded-xl">
                     <h5 className="font-bold text-amber-300 text-xs mb-1">Key Themes of the Chapter:</h5>

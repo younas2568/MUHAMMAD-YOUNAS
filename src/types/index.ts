@@ -1,6 +1,7 @@
 export type TabType = 
   | 'home' 
   | 'quran' 
+  | 'tafsir'
   | 'namaz' 
   | 'kalmas' 
   | 'hadith' 
@@ -12,7 +13,7 @@ export type TabType =
   | 'tasbeeh' 
   | 'ramadan';
 
-export type Language = 'en' | 'ur' | 'ar';
+export type Language = 'en' | 'ur' | 'ar' | 'ps';
 
 export interface SurahMeta {
   number: number;
@@ -20,6 +21,7 @@ export interface SurahMeta {
   transliteration: string;
   englishName: string;
   urduName: string;
+  pashtoName?: string;
   hindiName: string;
   totalVerses: number;
   revelationType: 'Meccan' | 'Medinan';
@@ -32,9 +34,13 @@ export interface Ayah {
   textArabic: string;
   translationEn: string;
   translationUr: string;
+  translationPs?: string; // Pashto (پښتو) translation
   translationHi: string;
   transliterationEn?: string;
   tafsir?: string;
+  tafsirUr?: string; // Urdu Tafsir
+  tafsirPs?: string; // Pashto Tafsir
+  tafsirEn?: string; // English Tafsir
   audioUrl?: string;
 }
 

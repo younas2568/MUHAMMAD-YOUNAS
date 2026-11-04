@@ -24,7 +24,8 @@ import {
   ShieldCheck,
   User,
   Heart,
-  Download
+  Download,
+  FileText
 } from 'lucide-react';
 import { calculatePrayerTimes, getHijriDate, POPULAR_CITIES, Coordinates } from '../../utils/prayerTimes';
 import { soundManager, AZAN_PRESETS } from '../../utils/audioPlayer';
@@ -120,7 +121,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   };
 
   const quickFeatures = [
-    { id: 'quran' as TabType, labelEn: 'Holy Quran', labelUr: 'قرآن مجید', desc: '114 Surahs, Urdu/En Audio', icon: BookOpen, color: 'from-emerald-700 to-teal-800', border: 'border-emerald-600/40' },
+    { id: 'quran' as TabType, labelEn: 'Holy Quran', labelUr: 'قرآن مجید (پښتو و اردو)', desc: '114 Surahs, Pashto/Urdu/En', icon: BookOpen, color: 'from-emerald-700 to-teal-800', border: 'border-emerald-600/40' },
+    { id: 'tafsir' as TabType, labelEn: 'Tafsir-ul-Quran', labelUr: 'تفسیر القرآن (پښتو و اردو)', desc: 'Pashto, Urdu & English Exegesis', icon: FileText, color: 'from-amber-600 via-amber-700 to-emerald-950', border: 'border-amber-400/60' },
     { id: 'namaz' as TabType, labelEn: 'Namaz Guide', labelUr: 'نماز گائیڈ', desc: '5 Prayers, Wudu, Recitations', icon: Clock, color: 'from-amber-600 to-amber-800', border: 'border-amber-500/40' },
     { id: 'kalmas' as TabType, labelEn: 'Six Kalmas', labelUr: 'چھ کلمے', desc: 'Vocalized Arabic & Audio', icon: Sparkles, color: 'from-teal-700 to-emerald-900', border: 'border-teal-500/40' },
     { id: 'hadith' as TabType, labelEn: 'Hadith Books', labelUr: 'احادیث کتب', desc: 'Bukhari, Muslim, Tirmidhi', icon: ScrollText, color: 'from-cyan-700 to-blue-900', border: 'border-cyan-500/40' },
